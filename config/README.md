@@ -71,7 +71,8 @@ CREATE TABLE `blog_info` (
  `description_info` VARCHAR(500) NOT NULL COMMENT '描述信息',
  `picture` VARCHAR(800) COMMENT '图片',
  `tag` VARCHAR(600) COMMENT '标签',
- `content` LONGTEXT NOT NULL COMMENT '内容'
+ `content` LONGTEXT NOT NULL COMMENT '内容',
+ `htmlContent` LONGTEXT NOT NULL COMMENT 'html内容'
 );
 ```
 

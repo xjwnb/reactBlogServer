@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-02-04 15:04:37
- * @LastEditTime: 2021-02-11 23:30:41
+ * @LastEditTime: 2021-02-12 19:25:19
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \xkc-react-blogServer\reactBlogServer\routes\admin.js
@@ -348,8 +348,9 @@ adminRouter.post("/postBlogInfo", async (ctx) => {
     htmlContent,
   } = body.blogInfo;
   let sql =
-    "INSERT INTO blog_info (title, name, time, description_info, picture, tag, content, htmlContent) VALUES (?, ?, ?, ? , ?, ?, ?, ?); ";
+    "INSERT INTO blog_info (visits, title, name, time, description_info, picture, tag, content, htmlContent) VALUES (?, ?, ?, ?, ? , ?, ?, ?, ?); ";
   let values = [
+    0,
     title,
     name,
     time,
@@ -467,7 +468,17 @@ adminRouter.post("/updateBlogInfo", async (ctx) => {
     htmlContent,
   } = body.blogInfo;
   let sql = `UPDATE blog_info SET title = ?, name = ?, time = ?, description_info = ?, picture = ?, tag = ?, content = ?, htmlContent = ? WHERE id = ?;`;
-  let values = [title, name, time, description_info, picture, tag, content, htmlContent, id];
+  let values = [
+    title,
+    name,
+    time,
+    description_info,
+    picture,
+    tag,
+    content,
+    htmlContent,
+    id,
+  ];
   try {
     await query(sql, values);
   } catch (err) {
@@ -484,6 +495,103 @@ adminRouter.post("/updateBlogInfo", async (ctx) => {
     code: 200,
     data: {
       msg: "更新博客信息成功",
+    },
+  });
+});
+
+// 博客表数据数量
+adminRouter.get("/getBlogInfoCount", async (ctx) => {
+  // 验证 token
+  if (!ctx.header && !ctx.header.authorization)
+    return (ctx.response.body = {
+      code: 404,
+      data: {
+        msg: "请求头没有token",
+      },
+    });
+  let token = ctx.header.authorization;
+  // 验证 token
+  try {
+    await tokenUtil.verifyToken(token, secret);
+  } catch (err) {
+    // 验证失败
+    return (ctx.response.body = {
+      code: 10011,
+      data: {
+        msg: "token 过期或无效",
+      },
+    });
+  }
+
+  let sql = `SELECT COUNT(*) FROM blog_info;`;
+  let count;
+  try {
+    count = await query(sql);
+  } catch (err) {
+    console.log(err);
+    return (ctx.response.body = {
+      code: 400,
+      data: {
+        msg: "数据库更新博客信息失败",
+      },
+    });
+  }
+  console.log("getBlogInfoCount", count[0]["COUNT(*)"]);
+
+  return (ctx.response.body = {
+    code: 200,
+    data: {
+      msg: "获取博客数量成功",
+      count: count[0]["COUNT(*)"],
+    },
+  });
+});
+
+// 删除博客信息
+adminRouter.post("/deleteBlogInfo", async (ctx) => {
+  // 验证 token
+  if (!ctx.header && !ctx.header.authorization)
+    return (ctx.response.body = {
+      code: 404,
+      data: {
+        msg: "请求头没有token",
+      },
+    });
+  let token = ctx.header.authorization;
+  // 验证 token
+  try {
+    await tokenUtil.verifyToken(token, secret);
+  } catch (err) {
+    // 验证失败
+    return (ctx.response.body = {
+      code: 10011,
+      data: {
+        msg: "token 过期或无效",
+      },
+    });
+  }
+
+  // 删除博客信息
+  let { body } = ctx.request;
+  let { id } = body;
+  let sql = `DELETE FROM blog_info WHERE id = ?;`;
+  let values = [id];
+  try {
+    await query(sql, values);
+  } catch (err) {
+    console.log(err);
+    return (ctx.response.body = {
+      code: 400,
+      data: {
+        msg: "数据库删除博客信息失败",
+      },
+    });
+  }
+
+  return (ctx.response.body = {
+    code: 200,
+    data: {
+      msg: "删除博客信息成功",
     },
   });
 });

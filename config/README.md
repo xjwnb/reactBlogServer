@@ -65,6 +65,7 @@ DELETE FROM tags_info WHERE NAME = 'asdasd';
 ```mysql
 CREATE TABLE `blog_info` (
  `id` INT AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+ `visits` BIGINT COMMENT '访问量',
  `title` VARCHAR(100) NOT NULL COMMENT '标题',
  `name` VARCHAR(100) NOT NULL COMMENT '姓名',
  `time` DATETIME NOT NULL COMMENT '发表时间',

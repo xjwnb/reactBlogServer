@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-02-04 15:04:37
- * @LastEditTime: 2021-02-12 19:25:19
+ * @LastEditTime: 2021-02-14 10:55:49
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \xkc-react-blogServer\reactBlogServer\routes\admin.js
@@ -381,7 +381,7 @@ adminRouter.post("/postBlogInfo", async (ctx) => {
   });
 });
 
-// 查询获取所有博客信息
+// 分页查询获取博客信息
 adminRouter.get("/getBlogInfo", async (ctx) => {
   if (!ctx.header && !ctx.header.authorization)
     return (ctx.response.body = {
@@ -408,6 +408,7 @@ adminRouter.get("/getBlogInfo", async (ctx) => {
   let sql = "SELECT * FROM blog_info ORDER BY id DESC LIMIT 10 OFFSET ?;";
   let { offset } = ctx.request.query;
   let values = [Number(offset)];
+  console.log(values)
   let blogInfoResult;
   try {
     blogInfoResult = await query(sql, values);
@@ -532,7 +533,7 @@ adminRouter.get("/getBlogInfoCount", async (ctx) => {
     return (ctx.response.body = {
       code: 400,
       data: {
-        msg: "数据库更新博客信息失败",
+        msg: "数据库获取博客内容条数信息失败",
       },
     });
   }

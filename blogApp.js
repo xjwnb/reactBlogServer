@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-02-04 11:10:03
- * @LastEditTime: 2021-02-06 21:54:20
+ * @LastEditTime: 2021-02-13 14:03:18
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \xkc-react-blogServer\reactBlogServer\blogApp.js
@@ -84,7 +84,7 @@ app.use(require("koa-static")(__dirname + "/public"));
 // jwt 验证 token
 app.use(
   koaJWT({ secret: secret }).unless({
-    path: [/^\/admin\/login/],
+    path: [/^\/admin\/login/, /^\/blog/],
   })
 );
 

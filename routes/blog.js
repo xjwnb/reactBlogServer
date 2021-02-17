@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-02-13 13:59:46
- * @LastEditTime: 2021-02-17 17:46:56
+ * @LastEditTime: 2021-02-17 23:15:25
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \reactBlogServer\routes\blog.js
@@ -211,7 +211,6 @@ blogRouter.get("/getBlogsInfoByTag", async (ctx) => {
   });
 });
 
-
 // 增加访问量
 blogRouter.get("/updateBlogVisits", async (ctx) => {
   let { id } = ctx.request.query;
@@ -234,6 +233,29 @@ blogRouter.get("/updateBlogVisits", async (ctx) => {
     code: 200,
     data: {
       msg: "博客访问量增加成功",
+    },
+  });
+});
+
+blogRouter.get("/getAboutInfo", async (ctx) => {
+  let aboutInfo;
+  let sql = `SELECT * FROM about_info WHERE id = 1;`;
+  try {
+    aboutInfo = await query(sql);
+  } catch (err) {
+    console.log(err);
+    return (ctx.response.body = {
+      code: 400,
+      data: {
+        msg: "数据库查询关于信息失败",
+      },
+    });
+  }
+  return (ctx.response.body = {
+    code: 200,
+    data: {
+      msg: "获取关于信息成功",
+      aboutInfo: aboutInfo[0],
     },
   });
 });

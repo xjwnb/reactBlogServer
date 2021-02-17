@@ -83,3 +83,19 @@ CREATE TABLE `blog_info` (
 INSERT INTO blog_info (title, NAME, TIME, description_info, picture, tag, content) VALUES ('标题', '小卡车', '2021-02-10 02:09:46', '描述信息' , 'picture.png', 'JavaScript', '内容'); 
 ```
 
+### 创建关于表
+
+```mysql
+CREATE TABLE `about_info` (
+ `id` INT PRIMARY KEY COMMENT '主键',
+ `content` LONGTEXT NOT NULL COMMENT '内容',
+ `htmlContent` LONGTEXT NOT NULL COMMENT 'html内容'
+);
+```
+
+插入第一条表信息
+
+```mysql
+INSERT INTO about_info VALUES (1, 'hhh', '<p>hhh</p>');
+```
+

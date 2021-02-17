@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-02-04 15:04:37
- * @LastEditTime: 2021-02-14 10:55:49
+ * @LastEditTime: 2021-02-17 21:59:45
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \xkc-react-blogServer\reactBlogServer\routes\admin.js
@@ -408,7 +408,7 @@ adminRouter.get("/getBlogInfo", async (ctx) => {
   let sql = "SELECT * FROM blog_info ORDER BY id DESC LIMIT 10 OFFSET ?;";
   let { offset } = ctx.request.query;
   let values = [Number(offset)];
-  console.log(values)
+  console.log(values);
   let blogInfoResult;
   try {
     blogInfoResult = await query(sql, values);
@@ -593,6 +593,107 @@ adminRouter.post("/deleteBlogInfo", async (ctx) => {
     code: 200,
     data: {
       msg: "删除博客信息成功",
+    },
+  });
+});
+
+
+/**
+ * About 
+ */
+
+// 查询 about 信息
+adminRouter.get("/getAboutInfo", async (ctx) => {
+  // 验证 token
+  if (!ctx.header && !ctx.header.authorization)
+    return (ctx.response.body = {
+      code: 404,
+      data: {
+        msg: "请求头没有token",
+      },
+    });
+  let token = ctx.header.authorization;
+  // 验证 token
+  try {
+    await tokenUtil.verifyToken(token, secret);
+  } catch (err) {
+    // 验证失败
+    return (ctx.response.body = {
+      code: 10011,
+      data: {
+        msg: "token 过期或无效",
+      },
+    });
+  }
+
+  let aboutInfo;
+  let sql = `SELECT * FROM about_info WHERE id = 1;`;
+  try {
+    aboutInfo = await query(sql);
+  } catch (err) {
+    console.log(err);
+    return (ctx.response.body = {
+      code: 400,
+      data: {
+        msg: "数据库查询关于信息失败",
+      },
+    });
+  }
+
+  return (ctx.response.body = {
+    code: 200,
+    data: {
+      msg: "获取关于信息成功",
+      aboutInfo: aboutInfo[0]
+    },
+  });
+});
+
+// 提交  About 信息
+adminRouter.post("/postAboutInfo", async (ctx) => {
+  // 验证 token
+  if (!ctx.header && !ctx.header.authorization)
+    return (ctx.response.body = {
+      code: 404,
+      data: {
+        msg: "请求头没有token",
+      },
+    });
+  let token = ctx.header.authorization;
+  // 验证 token
+  try {
+    await tokenUtil.verifyToken(token, secret);
+  } catch (err) {
+    // 验证失败
+    return (ctx.response.body = {
+      code: 10011,
+      data: {
+        msg: "token 过期或无效",
+      },
+    });
+  }
+
+  // 提交 about 信息
+  let { body } = ctx.request;
+  let { content, htmlContent } = body.aboutInfo;
+  let sql = `UPDATE about_info SET content = ?, htmlContent = ? WHERE id = 1;`;
+  let values = [content, htmlContent];
+  try {
+    await query(sql, values);
+  } catch (err) {
+    console.log(err);
+    return (ctx.response.body = {
+      code: 400,
+      data: {
+        msg: "数据库更新关于信息失败",
+      },
+    });
+  }
+
+  return (ctx.response.body = {
+    code: 200,
+    data: {
+      msg: "提交关于信息成功",
     },
   });
 });

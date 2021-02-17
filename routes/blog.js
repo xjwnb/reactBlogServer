@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-02-13 13:59:46
- * @LastEditTime: 2021-02-15 14:03:32
+ * @LastEditTime: 2021-02-17 17:46:56
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \reactBlogServer\routes\blog.js
@@ -80,7 +80,7 @@ blogRouter.get("/getBlogInfoByPage", async (ctx) => {
   let sql = "SELECT * FROM blog_info ORDER BY id DESC LIMIT 10 OFFSET ?;";
   let { offset } = ctx.request.query;
   let values = [Number(offset)];
-  console.log(values)
+  console.log(values);
   let blogInfoResult;
   try {
     blogInfoResult = await query(sql, values);
@@ -127,7 +127,6 @@ blogRouter.get("/getHotBlogInfo", async (ctx) => {
   });
 });
 
-
 // 根据 id 获取博客信息
 blogRouter.get("/getBlogInfoById", async (ctx) => {
   let { id } = ctx.request.query;
@@ -155,5 +154,88 @@ blogRouter.get("/getBlogInfoById", async (ctx) => {
   });
 });
 
+// 查询标签信息
+blogRouter.get("/getTagsInfo", async (ctx) => {
+  // 查询标签信息
+  let sql = `SELECT * FROM tags_info;`;
+  let tagsInfoData;
+  // 插入 mysql
+  try {
+    tagsInfoData = await query(sql);
+  } catch (err) {
+    console.log(err);
+    return (ctx.response.body = {
+      code: 400,
+      data: {
+        msg: "数据库查询标签信息失败",
+      },
+    });
+  }
+
+  return (ctx.response.body = {
+    code: 200,
+    data: {
+      msg: "获取标签信息成功",
+      data: {
+        tagsInfo: tagsInfoData,
+      },
+    },
+  });
+});
+
+// 根据标签获取相应博客
+blogRouter.get("/getBlogsInfoByTag", async (ctx) => {
+  let { tag } = ctx.request.query;
+  // 查询标签信息
+  let sql = `SELECT * FROM blog_info WHERE tag LIKE '%${tag}%';`;
+  let blogsInfoData;
+  // 插入 mysql
+  try {
+    blogsInfoData = await query(sql);
+  } catch (err) {
+    console.log(err);
+    return (ctx.response.body = {
+      code: 400,
+      data: {
+        msg: "数据库根据标签获取博客信息失败",
+      },
+    });
+  }
+
+  return (ctx.response.body = {
+    code: 200,
+    data: {
+      msg: "根据标签获取博客信息成功",
+      blogsInfo: blogsInfoData,
+    },
+  });
+});
+
+
+// 增加访问量
+blogRouter.get("/updateBlogVisits", async (ctx) => {
+  let { id } = ctx.request.query;
+  // 查询标签信息
+  let sql = `UPDATE blog_info SET visits = visits + 1 WHERE id = ${id};`;
+  // 插入 mysql
+  try {
+    await query(sql);
+  } catch (err) {
+    console.log(err);
+    return (ctx.response.body = {
+      code: 400,
+      data: {
+        msg: "数据库增加访问量信息失败",
+      },
+    });
+  }
+
+  return (ctx.response.body = {
+    code: 200,
+    data: {
+      msg: "博客访问量增加成功",
+    },
+  });
+});
 
 module.exports = blogRouter;

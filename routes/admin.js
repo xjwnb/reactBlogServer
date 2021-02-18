@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-02-04 15:04:37
- * @LastEditTime: 2021-02-17 21:59:45
+ * @LastEditTime: 2021-02-18 21:02:35
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \xkc-react-blogServer\reactBlogServer\routes\admin.js
@@ -597,11 +597,9 @@ adminRouter.post("/deleteBlogInfo", async (ctx) => {
   });
 });
 
-
 /**
- * About 
+ * About
  */
-
 // 查询 about 信息
 adminRouter.get("/getAboutInfo", async (ctx) => {
   // 验证 token
@@ -644,7 +642,7 @@ adminRouter.get("/getAboutInfo", async (ctx) => {
     code: 200,
     data: {
       msg: "获取关于信息成功",
-      aboutInfo: aboutInfo[0]
+      aboutInfo: aboutInfo[0],
     },
   });
 });
@@ -694,6 +692,149 @@ adminRouter.post("/postAboutInfo", async (ctx) => {
     code: 200,
     data: {
       msg: "提交关于信息成功",
+    },
+  });
+});
+
+/**
+ * Links 友链
+ */
+
+//  获取友链信息
+adminRouter.get("/getLinksInfo", async (ctx) => {
+  // 验证 token
+  if (!ctx.header && !ctx.header.authorization)
+    return (ctx.response.body = {
+      code: 404,
+      data: {
+        msg: "请求头没有token",
+      },
+    });
+  let token = ctx.header.authorization;
+  // 验证 token
+  try {
+    await tokenUtil.verifyToken(token, secret);
+  } catch (err) {
+    // 验证失败
+    return (ctx.response.body = {
+      code: 10011,
+      data: {
+        msg: "token 过期或无效",
+      },
+    });
+  }
+
+  // 请求友链
+  let linksInfo;
+  let sql = `SELECT * FROM links_info ;`;
+  try {
+    linksInfo = await query(sql);
+  } catch (err) {
+    console.log(err);
+    return (ctx.response.body = {
+      code: 400,
+      data: {
+        msg: "数据库查询友链信息失败",
+      },
+    });
+  }
+
+  return (ctx.response.body = {
+    code: 200,
+    data: {
+      msg: "获取友链信息成功",
+      linksInfo: linksInfo,
+    },
+  });
+});
+
+// 修改友链信息
+adminRouter.post("/updateLinksInfo", async (ctx) => {
+  // 验证 token
+  if (!ctx.header && !ctx.header.authorization)
+    return (ctx.response.body = {
+      code: 404,
+      data: {
+        msg: "请求头没有token",
+      },
+    });
+  let token = ctx.header.authorization;
+  // 验证 token
+  try {
+    await tokenUtil.verifyToken(token, secret);
+  } catch (err) {
+    // 验证失败
+    return (ctx.response.body = {
+      code: 10011,
+      data: {
+        msg: "token 过期或无效",
+      },
+    });
+  }
+  let { body } = ctx.request;
+  let { name, website, logoUrl, description, is_pass, id } = body.linksInfo;
+  let sql = `UPDATE links_info SET name = ?, website = ?, logoUrl  = ?, description = ?, is_pass = ? WHERE id = ?;`;
+  let values = [name, website, logoUrl, description, is_pass, id];
+  try {
+    await query(sql, values);
+  } catch (err) {
+    console.log(err);
+    return (ctx.response.body = {
+      code: 400,
+      data: {
+        msg: "数据库插更新友链信息失败",
+      },
+    });
+  }
+  return (ctx.response.body = {
+    code: 200,
+    data: {
+      msg: "更新友链信息成功",
+    },
+  });
+});
+
+// 删除友链信息
+adminRouter.post("/deleteLinksInfo", async (ctx) => {
+  // 验证 token
+  if (!ctx.header && !ctx.header.authorization)
+    return (ctx.response.body = {
+      code: 404,
+      data: {
+        msg: "请求头没有token",
+      },
+    });
+  let token = ctx.header.authorization;
+  // 验证 token
+  try {
+    await tokenUtil.verifyToken(token, secret);
+  } catch (err) {
+    // 验证失败
+    return (ctx.response.body = {
+      code: 10011,
+      data: {
+        msg: "token 过期或无效",
+      },
+    });
+  }
+  let { body } = ctx.request;
+  let { id } = body;
+  let sql = `DELETE FROM links_info WHERE id = ${id};`;
+  try {
+    await query(sql);
+  } catch (err) {
+    console.log(err);
+    return (ctx.response.body = {
+      code: 400,
+      data: {
+        msg: "数据库插删除友链信息失败",
+      },
+    });
+  }
+  return (ctx.response.body = {
+    code: 200,
+    data: {
+      msg: "删除友链信息成功",
     },
   });
 });

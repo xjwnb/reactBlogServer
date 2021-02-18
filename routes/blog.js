@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-02-13 13:59:46
- * @LastEditTime: 2021-02-17 23:15:25
+ * @LastEditTime: 2021-02-18 16:15:58
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \reactBlogServer\routes\blog.js
@@ -237,6 +237,7 @@ blogRouter.get("/updateBlogVisits", async (ctx) => {
   });
 });
 
+// 获取 about 信息
 blogRouter.get("/getAboutInfo", async (ctx) => {
   let aboutInfo;
   let sql = `SELECT * FROM about_info WHERE id = 1;`;
@@ -256,6 +257,33 @@ blogRouter.get("/getAboutInfo", async (ctx) => {
     data: {
       msg: "获取关于信息成功",
       aboutInfo: aboutInfo[0],
+    },
+  });
+});
+
+/**
+ * 友链
+ */
+blogRouter.post("/postLinksInfo", async (ctx) => {
+  let { body } = ctx.request;
+  let { name, website, logoUrl, description } = body.linksInfo;
+  let sql = `INSERT INTO links_info (name, website, logoUrl, description, is_pass) VALUES (?, ?, ?, ?, false);`;
+  let values = [name, website, logoUrl, description];
+  try {
+    await query(sql, values);
+  } catch (err) {
+    console.log(err);
+    return (ctx.response.body = {
+      code: 400,
+      data: {
+        msg: "数据库插入友链信息失败",
+      },
+    });
+  }
+  return (ctx.response.body = {
+    code: 200,
+    data: {
+      msg: "提交友链信息成功",
     },
   });
 });

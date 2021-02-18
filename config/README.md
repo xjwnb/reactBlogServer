@@ -99,3 +99,16 @@ CREATE TABLE `about_info` (
 INSERT INTO about_info VALUES (1, 'hhh', '<p>hhh</p>');
 ```
 
+### 创建友链表
+
+```mysql
+CREATE TABLE `links_info` (
+ `id` INT AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+ `name` VARCHAR(100) COMMENT '名称',
+ `website` VARCHAR(800) COMMENT '网址',
+ `logoUrl` VARCHAR(800) COMMENT 'logo 网址',
+ `description` VARCHAR(800) COMMENT '描述',
+ `is_pass` BOOLEAN COMMENT '是否通过'
+);
+```
+

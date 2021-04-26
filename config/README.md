@@ -80,7 +80,7 @@ CREATE TABLE `blog_info` (
 博客信息插入信息
 
 ```mysql
-INSERT INTO blog_info (title, NAME, TIME, description_info, picture, tag, content) VALUES ('标题', '小卡车', '2021-02-10 02:09:46', '描述信息' , 'picture.png', 'JavaScript', '内容'); 
+INSERT INTO blog_info (title, NAME, TIME, description_info, picture, tag, content, htmlContent) VALUES ('标题', '小卡车', '2021-02-10 02:09:46', '描述信息' , 'picture.png', 'JavaScript', '内容', '<p>内容</p>'); 
 ```
 
 ### 创建关于表
@@ -110,5 +110,12 @@ CREATE TABLE `links_info` (
  `description` VARCHAR(800) COMMENT '描述',
  `is_pass` BOOLEAN COMMENT '是否通过'
 );
+```
+
+### 服务器数据库修改字符
+
+```mysql
+alter table 表名 change 列名 名 varchar(100) character set utf8;
+alter table links_info change description description VARCHAR(800) character set utf8;
 ```
 

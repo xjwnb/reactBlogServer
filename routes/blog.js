@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-02-13 13:59:46
- * @LastEditTime: 2021-02-18 16:15:58
+ * @LastEditTime: 2021-02-19 12:45:31
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \reactBlogServer\routes\blog.js
@@ -287,5 +287,29 @@ blogRouter.post("/postLinksInfo", async (ctx) => {
     },
   });
 });
+
+// 获取通过的友链信息
+blogRouter.get("/getLinksInfoByPass", async (ctx) => {
+  let sql = "SELECT * FROM links_info WHERE is_pass = true;"
+  let linksInfo;
+  try {
+    linksInfo = await query(sql);
+  } catch (err) {
+    console.log(err);
+    return (ctx.response.body = {
+      code: 400,
+      data: {
+        msg: "数据库获取通过的友链信息失败",
+      },
+    });
+  }
+  return (ctx.response.body = {
+    code: 200,
+    data: {
+      msg: "获取通过的友链信息成功",
+      linksInfo
+    },
+  });
+})
 
 module.exports = blogRouter;

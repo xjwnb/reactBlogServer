@@ -119,3 +119,37 @@ alter table 表名 change 列名 名 varchar(100) character set utf8;
 alter table links_info change description description VARCHAR(800) character set utf8;
 ```
 
+### 创建生活区表
+
+```mysql
+CREATE TABLE `life` (
+ `id` INT AUTO_INCREMENT PRIMARY KEY COMMENT 'id',
+ `time` DATETIME NOT NULL COMMENT '发布时间',
+ `title` VARCHAR(100) NOT NULL COMMENT '标题',
+ `visits` BIGINT COMMENT '访问量',
+ `isTop` BOOLEAN NOT NULL COMMENT '是否置顶',
+ `description_img` VARCHAR(800) COMMENT '描述图片',
+ `description_info` VARCHAR(800) NOT NULL COMMENT '描述信息',
+ `content` LONGTEXT NOT NULL COMMENT '内容',
+ `htmlContent` LONGTEXT NOT NULL COMMENT 'html 内容'
+);
+
+CREATE TABLE `life` (
+ `id` INT AUTO_INCREMENT PRIMARY KEY COMMENT 'id',
+ `time` DATETIME NOT NULL COMMENT '发布时间',
+ `title` VARCHAR(100) NOT NULL COMMENT '标题',
+ `visits` BIGINT COMMENT '访问量',
+ `isTop` BOOLEAN NOT NULL COMMENT '是否置顶',
+ `description_img` VARCHAR(800) COMMENT '描述图片',
+ `description_info` VARCHAR(800) NOT NULL COMMENT '描述信息',
+ `content` LONGTEXT NOT NULL COMMENT '内容',
+ `htmlContent` LONGTEXT NOT NULL COMMENT 'html 内容'
+) DEFAULT CHARSET=utf8;
+```
+
+### 插入生活区数据
+
+```mysql
+INSERT INTO life VALUES (1, '2021-04-26 00:00:00', '我是标题', 100, FALSE, 'http://xkc-oss-bucket.oss-cn-guangzhou.aliyuncs.com/avatar/1612786683218_author1.jpg', '生活乐趣多', '这生活', '<p>这生活</p>' );
+```
+

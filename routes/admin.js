@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-02-04 15:04:37
- * @LastEditTime: 2021-02-18 21:02:35
+ * @LastEditTime: 2021-04-27 16:07:33
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \xkc-react-blogServer\reactBlogServer\routes\admin.js
@@ -835,6 +835,242 @@ adminRouter.post("/deleteLinksInfo", async (ctx) => {
     code: 200,
     data: {
       msg: "删除友链信息成功",
+    },
+  });
+});
+
+/**
+ * 生活区
+ */
+
+// 获取生活区表数据（分页）
+adminRouter.get("/getLifeInfo", async (ctx) => {
+  if (!ctx.header && !ctx.header.authorization)
+    return (ctx.response.body = {
+      code: 404,
+      data: {
+        msg: "请求头没有token",
+      },
+    });
+  let token = ctx.header.authorization;
+  // 验证 token
+  try {
+    await tokenUtil.verifyToken(token, secret);
+  } catch (err) {
+    // 验证失败
+    return (ctx.response.body = {
+      code: 10011,
+      data: {
+        msg: "token 过期或无效",
+      },
+    });
+  }
+
+  let sql = "SELECT * FROM life ORDER BY id DESC LIMIT 10 OFFSET ?;";
+  let sqlCount = "SELECT COUNT(id) FROM life;";
+  let { offset } = ctx.request.query;
+  let values = [Number(offset)];
+  console.log(values);
+  let lifeInfoResult;
+  let lifeCount;
+  try {
+    lifeInfoResult = await query(sql, values);
+    lifeCount = await query(sqlCount);
+    console.log(lifeCount[0]["COUNT(id)"]);
+  } catch (err) {
+    console.log(err);
+    return (ctx.response.body = {
+      code: 500,
+      data: {
+        msg: "数据库查询生活区信息失败",
+      },
+    });
+  }
+
+  return (ctx.response.body = {
+    code: 200,
+    data: {
+      lifeList: lifeInfoResult,
+    },
+    msg: "获取生活区数据成功！",
+    total: lifeCount[0]["COUNT(id)"],
+  });
+});
+
+// 更新修改生活区信息
+adminRouter.post("/updateLifeInfo", async (ctx) => {
+  // 验证 token
+  if (!ctx.header && !ctx.header.authorization)
+    return (ctx.response.body = {
+      code: 404,
+      data: {
+        msg: "请求头没有token",
+      },
+    });
+  let token = ctx.header.authorization;
+  // 验证 token
+  try {
+    await tokenUtil.verifyToken(token, secret);
+  } catch (err) {
+    // 验证失败
+    return (ctx.response.body = {
+      code: 10011,
+      data: {
+        msg: "token 过期或无效",
+      },
+    });
+  }
+
+  // 更新修改生活区信息
+  let { body } = ctx.request;
+  console.log(body);
+  let {
+    id,
+    time,
+    title,
+    visits,
+    isTop,
+    description_img,
+    description_info,
+    content,
+    htmlContent,
+  } = body.lifeInfo;
+  let sql =
+    "UPDATE life SET  time = ?, title = ?, visits = ?, isTop = ?, description_img = ?, description_info = ?, content = ?, htmlContent = ? WHERE id = ?;";
+  let values = [
+    time,
+    title,
+    visits,
+    isTop,
+    description_img,
+    description_info,
+    content,
+    htmlContent,
+    id,
+  ];
+  try {
+    await query(sql, values);
+  } catch (err) {
+    console.log(err);
+    return (ctx.response.body = {
+      code: 400,
+      data: {
+        msg: "数据库更新生活区信息失败",
+      },
+    });
+  }
+  return (ctx.response.body = {
+    code: 200,
+    msg: "更新生活区信息成功",
+  });
+});
+
+// 提交添加生活区信息
+adminRouter.post("/postLifeInfo", async (ctx) => {
+  if (!ctx.header && !ctx.header.authorization)
+    return (ctx.response.body = {
+      code: 404,
+      data: {
+        msg: "请求头没有token",
+      },
+    });
+  let token = ctx.header.authorization;
+  // 验证 token
+  try {
+    await tokenUtil.verifyToken(token, secret);
+  } catch (err) {
+    // 验证失败
+    return (ctx.response.body = {
+      code: 10011,
+      data: {
+        msg: "token 过期或无效",
+      },
+    });
+  }
+
+  let { body } = ctx.request;
+  let {
+    time,
+    title,
+    visits,
+    isTop,
+    description_img,
+    description_info,
+    content,
+    htmlContent,
+  } = body.lifeInfo;
+  let sql =
+    "INSERT INTO life (time, title, visits, isTop, description_img, description_info, content, htmlContent) VALUES (?, ?, 0, FALSE, ?, ?, ?, ?);";
+  let values = [
+    time,
+    title,
+    description_img,
+    description_info,
+    content,
+    htmlContent,
+  ];
+  try {
+    await query(sql, values);
+  } catch (err) {
+    console.log(err);
+    return (ctx.response.body = {
+      code: 500,
+      data: {
+        msg: "数据库新增生活区数据失败",
+      },
+    });
+  }
+
+  return (ctx.response.body = {
+    code: 200,
+    data: {
+      msg: "插入新增生活区数据成功",
+    },
+  });
+});
+
+// 删除生活区信息
+adminRouter.post("/deleteLifeInfo", async (ctx) => {
+  if (!ctx.header && !ctx.header.authorization)
+    return (ctx.response.body = {
+      code: 404,
+      data: {
+        msg: "请求头没有token",
+      },
+    });
+  let token = ctx.header.authorization;
+  // 验证 token
+  try {
+    await tokenUtil.verifyToken(token, secret);
+  } catch (err) {
+    // 验证失败
+    return (ctx.response.body = {
+      code: 10011,
+      data: {
+        msg: "token 过期或无效",
+      },
+    });
+  }
+
+  // 删除生活区信息
+  let { body } = ctx.request;
+  let { id } = body;
+  let sql = "DELETE FROM life WHERE id = ?";
+  let values = [id];
+  try {
+    await query(sql, values);
+  } catch (err) {
+    return (ctx.response.body = {
+      code: 500,
+      data: {
+        msg: "数据库删除生活区信息失败",
+      },
+    });
+  }
+  return (ctx.response.body = {
+    code: 200,
+    data: {
+      msg: "删除生活区信息成功",
     },
   });
 });

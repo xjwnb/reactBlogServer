@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-02-13 13:59:46
- * @LastEditTime: 2021-02-19 12:45:31
+ * @LastEditTime: 2021-04-28 22:20:25
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \reactBlogServer\routes\blog.js
@@ -290,7 +290,7 @@ blogRouter.post("/postLinksInfo", async (ctx) => {
 
 // 获取通过的友链信息
 blogRouter.get("/getLinksInfoByPass", async (ctx) => {
-  let sql = "SELECT * FROM links_info WHERE is_pass = true;"
+  let sql = "SELECT * FROM links_info WHERE is_pass = true;";
   let linksInfo;
   try {
     linksInfo = await query(sql);
@@ -307,9 +307,97 @@ blogRouter.get("/getLinksInfoByPass", async (ctx) => {
     code: 200,
     data: {
       msg: "获取通过的友链信息成功",
-      linksInfo
+      linksInfo,
     },
   });
-})
+});
+
+/**
+ * 生活区
+ */
+// 分页获取生活区信息
+blogRouter.get("/getLifeInfo", async (ctx) => {
+  // let sql = "SELECT * FROM life ORDER BY id DESC LIMIT 10 OFFSET ?;";
+  let sql = "SELECT * FROM life ORDER BY isTop = TRUE DESC, id DESC LIMIT 10 OFFSET ?;"
+  let sqlCount = "SELECT COUNT(id) FROM life;";
+  let { offset } = ctx.request.query;
+  let values = [Number(offset)];
+  console.log(values);
+  let lifeInfoResult;
+  let lifeCount;
+  try {
+    lifeInfoResult = await query(sql, values);
+    lifeCount = await query(sqlCount);
+    console.log(lifeCount[0]["COUNT(id)"]);
+  } catch (err) {
+    console.log(err);
+    return (ctx.response.body = {
+      code: 500,
+      data: {
+        msg: "数据库查询生活区信息失败",
+      },
+    });
+  }
+
+  return (ctx.response.body = {
+    code: 200,
+    data: {
+      lifeList: lifeInfoResult,
+    },
+    msg: "获取生活区数据成功！",
+    total: lifeCount[0]["COUNT(id)"],
+  });
+});
+
+// 根据 id 获取生活区详情
+blogRouter.get("/getLifeDetail", async (ctx) => {
+  let { id } = ctx.request.query;
+  let sql = "SELECT * FROM life WHERE id = ?;";
+  let values = [id];
+  let lifeDetail;
+  try {
+    lifeDetail = await query(sql, values);
+  } catch (err) {
+    console.log(err);
+    ctx.response.body = {
+      code: 500,
+      data: {
+        msg: "服务端获取生活区详情失败",
+      },
+    };
+  }
+
+  return (ctx.response.body = {
+    code: 200,
+    data: {
+      lifeDetail,
+    },
+    msg: "成功获取到生活区详情信息",
+  });
+});
+
+// 增加访问量
+blogRouter.get("/updateLifeVisits", async (ctx) => {
+  let { id } = ctx.request.query;
+  // 查询标签信息
+  let sql = `UPDATE life SET visits = visits + 1 WHERE id = ${id};`;
+  // 插入 mysql
+  try {
+    await query(sql);
+  } catch (err) {
+    console.log(err);
+    return (ctx.response.body = {
+      code: 400,
+      data: {
+        msg: "数据库增加生活区详情访问量信息失败",
+      },
+    });
+  }
+
+  return (ctx.response.body = {
+    code: 200,
+    msg: "生活区访问量增加成功",
+  });
+});
 
 module.exports = blogRouter;

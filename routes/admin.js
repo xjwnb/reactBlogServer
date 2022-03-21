@@ -186,9 +186,39 @@ adminRouter.post("/postTagsInfo", async (ctx) => {
     });
   }
 
-  // 提交标签信息
   let { body } = ctx.request;
   let { name, color } = body.tagsInfo;
+
+  /**
+   * 校验是否插入重复的标签名
+   */
+  let querySQL = `SELECT * FROM tags_info WHERE name = ?;`;
+  let queryValue = [name];
+  let queryTagsInfo = null;
+  try {
+    queryTagsInfo = await query(querySQL, queryValue);
+  } catch (err) {
+    console.log(err);
+    return (ctx.response.body = {
+      code: 400,
+      data: {
+        msg: "服务器异常！",
+      },
+    });
+  }
+
+  console.log(queryTagsInfo);
+  if (queryTagsInfo.length) {
+    return (ctx.response.body = {
+      code: 400,
+      data: {
+        msg: "标签名称重复！",
+      },
+    });
+  }
+
+  // 提交标签信息
+
   let sql = `INSERT INTO tags_info (name, color) VALUES (?, ?);`;
   let values = [name, color];
   // 插入 mysql
@@ -287,9 +317,12 @@ adminRouter.post("/deleteTagsInfo", async (ctx) => {
 
   // 删除标签信息
   let { body } = ctx.request;
-  let { name } = body;
-  let sql = `DELETE FROM tags_info WHERE name = ?;`;
-  let values = [name];
+  // let { name } = body;
+  // let sql = `DELETE FROM tags_info WHERE name = ?;`;
+  // let values = [name];
+  let { id } = body;
+  let sql = `DELETE FROM tags_info WHERE id = ?;`;
+  let values = [id];
   let tagsInfoData;
   // 插入 mysql
   try {
@@ -308,6 +341,56 @@ adminRouter.post("/deleteTagsInfo", async (ctx) => {
     code: 200,
     data: {
       msg: "删除标签信息成功",
+    },
+  });
+});
+
+// 编辑修改标签信息
+adminRouter.post("/updateTagsInfo", async (ctx) => {
+  if (!ctx.header && !ctx.header.authorization)
+    return (ctx.response.body = {
+      code: 404,
+      data: {
+        msg: "请求头没有token",
+      },
+    });
+  let token = ctx.header.authorization;
+  // 验证 token
+  try {
+    await tokenUtil.verifyToken(token, secret);
+  } catch (err) {
+    // 验证失败
+    return (ctx.response.body = {
+      code: 10011,
+      data: {
+        msg: "token 过期或无效",
+      },
+    });
+  }
+
+  let { body } = ctx.request;
+  let { id, name, color } = body;
+
+
+  let sql = `UPDATE tags_info SET name = ?, color = ? WHERE id = ?;`;
+  let values = [name, color, id];
+
+  try {
+    await query(sql, values);
+  } catch (err) {
+    console.log(err);
+    return (ctx.response.body = {
+      code: 400,
+      data: {
+        msg: "数据库更新标签信息失败",
+      },
+    });
+  }
+
+  return (ctx.response.body = {
+    code: 200,
+    data: {
+      msg: "修改标签信息成功",
     },
   });
 });

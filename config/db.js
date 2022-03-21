@@ -12,7 +12,8 @@ const connection = mysql.createConnection({
   host: "localhost",
   port: "3306",
   user: "root",
-  password: "123456",
+  // user: 'xkc',
+  password: "12345678", // mac：12345678 linux：123456
   database: "react_blog",
   multipleStatements: true
 });
